@@ -6,6 +6,11 @@ from django.contrib.auth import login, authenticate
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.sessions.backends.db import SessionStore
+from datetime import datetime
+
 
 # vista para insertar un usuario en la tabla USUARIO
 def registro(request):
@@ -45,20 +50,23 @@ def iniciosesion(request):
         correo = request.POST.get('correo')
         password = request.POST.get('password')
 
+
         # Consulta con cursor SQL
         try:
             with connection.cursor() as cursor:
                 cursor.execute("""
-                    SELECT nombre 
+                    SELECT nombre, id_us
                     FROM USUARIO 
                     WHERE correo = %s AND password = %s
                 """, [correo, password])
                 user = cursor.fetchone()
             
             if user:
-                # Usuario autenticado, redirigir a otro template
+                # guardamos el documento en sesión
+                request.session['documento'] = user[1]  
                 messages.success(request, f"Bienvenido {user[0]}!")
-                return redirect('home')  # Cambia 'home' por tu URL correspondiente
+                return redirect('home')  
+
             else:
                 messages.error(request, "Credenciales incorrectas. Inténtalo de nuevo.")
         except Exception as e:
@@ -66,5 +74,39 @@ def iniciosesion(request):
 
     return render(request, 'iniciosesion.html')
 
+
 def home(request):
     return render(request, 'home.html')
+
+def publicar(request):
+    if request.method == 'POST':
+        titulo = request.POST['titulo']
+        contenido = request.POST['contenido']
+
+        #obetemos el doc del usuario logueado
+        documento = request.session.get('documento')
+        print('id del usuario fino: ',documento)
+
+        # Obtenemos la fecha y la hora actuales
+        fecha_pub = datetime.now().strftime('%Y-%m-%d')  
+        hora_pub = datetime.now().strftime('%H:%M:%S')  
+
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                            INSERT INTO PUBLICACION (id_us, contenido, fecha_pub, titulo, hora_pub)
+                            VALUES (%s, %s, %s, %s, %s)
+                        """, [documento, contenido, fecha_pub, titulo, hora_pub])
+        
+            messages.success(request, "Publicación exitosa.")
+            return redirect('home') 
+
+
+
+    return render(request, 'home.html')
+
+
+def cerrar_sesion(request):
+    logout(request)  
+    messages.success(request, "Sesión cerrada correctamente.")
+    return redirect('iniciosesion')  

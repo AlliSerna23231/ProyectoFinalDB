@@ -20,8 +20,10 @@ CREATE TABLE USUARIO(
 CREATE TABLE PUBLICACION(
     id_publicacion int PRIMARY KEY,
     id_us int,
+    titulo VARCHAR(50),
     contenido VARCHAR(1000),
     fecha_pub DATE,
+    hora_pub TIME,
     CONSTRAINT fk_publicacion_id_us FOREIGN KEY (id_us) REFERENCES USUARIO(id_us)
 );
 
