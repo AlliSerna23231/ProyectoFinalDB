@@ -1,0 +1,16 @@
+pip install mysqlclient
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ProyectoFinalDB',
+        'USER': 'tu_usuario',
+        'PASSWORD': 'tu_contraseña',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+
+crear la db
+
+python manage.py migrate
