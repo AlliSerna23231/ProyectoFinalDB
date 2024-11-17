@@ -21,13 +21,13 @@ def registro(request):
             ubicacion = request.POST['ubicacion']
 
             #cifrar el password
-            hashed_password = make_password(password)
+            #hashed_password = make_password(password)
 
             with connection.cursor() as cursor:
                 cursor.execute("""
                             INSERT INTO USUARIO (id_us, nombre, apellido, correo, password, fecha_nac, ubicacion)
                             VALUES (%s, %s, %s, %s, %s, %s, %s)
-                        """, [documento, nombre, apellido, correo, hashed_password, fecha_nac, ubicacion])
+                        """, [documento, nombre, apellido, correo, password, fecha_nac, ubicacion])
         
             messages.success(request, "Registro de usuario exitoso.")
             return redirect('registro')
@@ -40,3 +40,31 @@ def registro(request):
 
     return render(request, 'registro.html')
 
+def iniciosesion(request):
+    if request.method == 'POST':
+        correo = request.POST.get('correo')
+        password = request.POST.get('password')
+
+        # Consulta con cursor SQL
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("""
+                    SELECT nombre 
+                    FROM USUARIO 
+                    WHERE correo = %s AND password = %s
+                """, [correo, password])
+                user = cursor.fetchone()
+            
+            if user:
+                # Usuario autenticado, redirigir a otro template
+                messages.success(request, f"Bienvenido {user[0]}!")
+                return redirect('home')  # Cambia 'home' por tu URL correspondiente
+            else:
+                messages.error(request, "Credenciales incorrectas. Inténtalo de nuevo.")
+        except Exception as e:
+            messages.error(request, f"Ocurrió un error: {str(e)}")
+
+    return render(request, 'iniciosesion.html')
+
+def home(request):
+    return render(request, 'home.html')
