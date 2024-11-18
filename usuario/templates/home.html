@@ -246,6 +246,8 @@
     <nav class="navbar">
         <div>
             <a href="{% url 'home' %}" aria-label="Ir al Feed">Feed</a>
+            <a href="{% url '#' %}" aria-label="Ir a buscar amigos">Buscar amigos</a>
+
         </div>
         <div>
             <a href="{% url 'cerrar_sesion' %}" aria-label="Cerrar Sesión">Cerrar Sesión</a>
@@ -254,16 +256,16 @@
 
     <header class="profile-header">
         <img src="https://via.placeholder.com/180" alt="Foto de perfil" class="profile-pic">
-        <h1 class="profile-name">Juan Pérez</h1>
-        <p class="profile-info">Estudiante de Ingeniería | Universidad XYZ</p>
+        <h1 class="profile-name">{{ usuario.nombre }} {{ usuario.apellido }}</h1> <!-- Nombre y Apellido -->
+        <p class="profile-info">{{ usuario.fecha_nac }}</p> <!-- Fecha de Nacimiento -->
     </header>
 
     <div class="content">
         <aside class="left-sidebar">
             <h2>Información Personal</h2>
-            <p><strong>Edad:</strong> 22 años</p>
-            <p><strong>Correo:</strong> jp@gmail.com</p>
-            <p><strong>Ubicación:</strong> Medellín</p>
+            <p><strong>Edad:</strong> {{ usuario.edad }}</p> <!-- Edad -->
+            <p><strong>Correo:</strong> {{ usuario.correo }}</p> <!-- Correo -->
+            <p><strong>Ubicación:</strong> {{ usuario.ubicacion }}</p> <!-- Ubicación -->
         </aside>
 
         <main class="main-content">
@@ -279,21 +281,22 @@
                 </form>
             </section>
 
+            {% for publicacion in publicaciones %}
             <article class="post">
-                <p>¡Hola a todos! Acabo de terminar mi proyecto final. ¡Qué emoción! 🎉</p>
+                <h2>{{ publicacion.titulo }}</h2> <!-- Título -->
+                <p>{{ publicacion.contenido }}</p> <!-- Contenido -->
+                <p>
+                    <small>Publicado el {{ publicacion.fecha }} a las {{ publicacion.hora }}</small>
+                </p> <!-- Fecha y Hora -->
                 <div class="post-actions">
                     <button class="button" aria-label="Me gusta a esta publicación">Me gusta</button>
                     <button class="button" aria-label="Comentar en esta publicación">Comentar</button>
                 </div>
             </article>
+            {% empty %}
+            <p>No tienes publicaciones.</p>
+            {% endfor %}
 
-            <article class="post">
-                <p>¿Alguien quiere unirse a un grupo de estudio para el examen de mañana? 📚</p>
-                <div class="post-actions">
-                    <button class="button" aria-label="Me gusta a esta publicación">Me gusta</button>
-                    <button class="button" aria-label="Comentar en esta publicación">Comentar</button>
-                </div>
-            </article>
         </main>
     </div>
 

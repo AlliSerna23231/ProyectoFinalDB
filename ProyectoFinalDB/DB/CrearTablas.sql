@@ -18,7 +18,7 @@ CREATE TABLE USUARIO(
 
 
 CREATE TABLE PUBLICACION(
-    id_publicacion int PRIMARY KEY,
+    id_publicacion int AUTO_INCREMENT PRIMARY KEY,
     id_us int,
     titulo VARCHAR(50),
     contenido VARCHAR(1000),
@@ -28,7 +28,7 @@ CREATE TABLE PUBLICACION(
 );
 
 CREATE TABLE ME_GUSTA(
-    id_megusta int PRIMARY KEY,
+    id_megusta int AUTO_INCREMENT PRIMARY KEY,
     id_us int,
     id_publicacion int,
     CONSTRAINT fk_megusta_id_us FOREIGN KEY (id_us) REFERENCES USUARIO(id_us),
@@ -36,7 +36,7 @@ CREATE TABLE ME_GUSTA(
 );
 
 CREATE TABLE COMENTARIO(
-    id_coment int PRIMARY KEY,
+    id_coment int AUTO_INCREMENT PRIMARY KEY,
     id_us int,
     id_publicacion int,
     contenido VARCHAR(1000),
@@ -47,7 +47,7 @@ CREATE TABLE COMENTARIO(
 
 
 CREATE TABLE MENSAJE(
-    id_mes int PRIMARY KEY,
+    id_mes int AUTO_INCREMENT PRIMARY KEY,
     id_us int,
     id_us2 int,
     contenido VARCHAR(1000),
@@ -56,7 +56,7 @@ CREATE TABLE MENSAJE(
 );
 
 CREATE TABLE AMISTAD(
-    id_amis int PRIMARY KEY,
+    id_amis int AUTO_INCREMENT PRIMARY KEY,
     id_us int,
     id_us2 int,
     CONSTRAINT fk_amistad_id_us FOREIGN KEY (id_us) REFERENCES USUARIO(id_us)

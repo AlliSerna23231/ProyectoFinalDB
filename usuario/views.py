@@ -60,6 +60,7 @@ def iniciosesion(request):
                     WHERE correo = %s AND password = %s
                 """, [correo, password])
                 user = cursor.fetchone()
+                print('usuario fino: ' , user)
             
             if user:
                 # guardamos el documento en sesión
@@ -75,8 +76,39 @@ def iniciosesion(request):
     return render(request, 'iniciosesion.html')
 
 
+from datetime import date
+
 def home(request):
-    return render(request, 'home.html')
+    documento = request.session.get('documento')  
+    usuario = []
+
+    if documento:
+        with connection.cursor() as cursor:
+            query = """
+                SELECT nombre, apellido, correo, fecha_nac, ubicacion
+                FROM usuario
+                WHERE id_us = %s
+            """
+            cursor.execute(query, [documento])  
+            result = cursor.fetchone()  
+
+            if result:
+                nombre, apellido, correo, fecha_nac, ubicacion = result
+                today = date.today()
+                edad = today.year - fecha_nac.year - ((today.month, today.day) < (fecha_nac.month, fecha_nac.day))
+                
+                usuario = {
+                    'nombre': nombre,
+                    'apellido': apellido,
+                    'correo': correo,
+                    'fecha_nac': fecha_nac,
+                    'edad': edad,
+                    'ubicacion': ubicacion,
+                }
+
+    return render(request, 'home.html', {'usuario': usuario})
+
+
 
 def publicar(request):
     if request.method == 'POST':
@@ -104,6 +136,34 @@ def publicar(request):
 
 
     return render(request, 'home.html')
+
+
+def mostrar_publicacion(request):
+    documento = request.session.get('documento')  
+    
+    publicaciones = []  # Lista para almacenar publicaciones
+    
+    if documento:
+        # Abre un cursor para ejecutar la consulta SQL
+        with connection.cursor() as cursor:
+            query = """
+                SELECT titulo, contenido, fech_pub, hora_pub
+                FROM publicacion
+                WHERE id_us = %s
+            """
+            cursor.execute(query, [documento])  # Evita SQL Injection utilizando parámetros
+            results = cursor.fetchall()  # Recupera todas las publicaciones como una lista de tuplas
+            
+            # Convierte cada tupla en un diccionario
+            publicaciones = [
+                {'titulo': row[0], 'contenido': row[1], 'fecha': row[2], 'hora': row[3]}
+                for row in results
+            ]
+    
+            print('publiii que hay: ', publicaciones)
+    # Renderiza la plantilla y pasa las publicaciones al contexto
+    return render(request, 'home.html', {'publicaciones': publicaciones})
+
 
 
 def cerrar_sesion(request):
