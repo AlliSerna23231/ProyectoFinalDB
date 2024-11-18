@@ -141,20 +141,18 @@ def publicar(request):
 def mostrar_publicacion(request):
     documento = request.session.get('documento')  
     
-    publicaciones = []  # Lista para almacenar publicaciones
+    publicaciones = []  
     
     if documento:
-        # Abre un cursor para ejecutar la consulta SQL
         with connection.cursor() as cursor:
             query = """
                 SELECT titulo, contenido, fech_pub, hora_pub
                 FROM publicacion
                 WHERE id_us = %s
             """
-            cursor.execute(query, [documento])  # Evita SQL Injection utilizando parámetros
-            results = cursor.fetchall()  # Recupera todas las publicaciones como una lista de tuplas
+            cursor.execute(query, [documento])  
+            results = cursor.fetchall()  
             
-            # Convierte cada tupla en un diccionario
             publicaciones = [
                 {'titulo': row[0], 'contenido': row[1], 'fecha': row[2], 'hora': row[3]}
                 for row in results
@@ -164,6 +162,130 @@ def mostrar_publicacion(request):
     # Renderiza la plantilla y pasa las publicaciones al contexto
     return render(request, 'home.html', {'publicaciones': publicaciones})
 
+def buscar_amigos(request):
+    documento = request.session.get('documento')  
+
+    usuarios = []  
+
+    if documento:
+        with connection.cursor() as cursor:
+            query = """
+                SELECT id_us, nombre, apellido, correo, fecha_nac, ubicacion
+                FROM usuario
+                WHERE id_us != %s
+            """
+            cursor.execute(query, [documento])  
+            results = cursor.fetchall()
+
+            usuarios = [
+                {
+                    'id_us': row[0],
+                    'nombre': row[1],
+                    'apellido': row[2],
+                    'correo': row[3],
+                    'fecha_nac': row[4],
+                    'ubicacion': row[5],
+                }
+                for row in results
+            ]
+    
+    return render(request, 'addamigos.html', {'usuarios': usuarios})
+
+
+def ver_perfil(request, id_us):
+    usuario = []
+
+    if id_us:
+        with connection.cursor() as cursor:
+            query = """
+                SELECT nombre, apellido, correo, fecha_nac, ubicacion
+                FROM usuario
+                WHERE id_us = %s
+            """
+            cursor.execute(query, [id_us])  
+            result = cursor.fetchone()  
+
+            if result:
+                nombre, apellido, correo, fecha_nac, ubicacion = result
+                today = date.today()
+                edad = today.year - fecha_nac.year - ((today.month, today.day) < (fecha_nac.month, fecha_nac.day))
+                
+                usuario = {
+                    'nombre': nombre,
+                    'apellido': apellido,
+                    'correo': correo,
+                    'fecha_nac': fecha_nac,
+                    'edad': edad,
+                    'ubicacion': ubicacion,
+                }
+
+    return render(request, 'verperfil.html', {'usuario': usuario})
+
+def chatear(request, id_us):
+    # Obtengo el documento del usuario logueado
+    documento = request.session.get('documento')
+
+    if not documento:
+        return redirect('iniciosesion')  
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_us, contenido, fec_envio
+            FROM mensaje
+            WHERE (id_us = %s AND id_us2 = %s) OR (id_us = %s AND id_us2 = %s)
+            ORDER BY fec_envio
+        """, [documento, id_us, id_us, documento])
+        mensajes = cursor.fetchall()
+
+        cursor.execute("""
+            SELECT nombre, apellido
+            FROM usuario
+            WHERE id_us = %s
+        """, [id_us])
+        usuario_seleccionado = cursor.fetchone()
+
+
+        if usuario_seleccionado:
+            nombre_usuario = usuario_seleccionado[0]
+            apellido_usuario = usuario_seleccionado[1]
+        else:
+            nombre_usuario = "Desconocido"
+            apellido_usuario = ""
+
+    mensajes_dict = [{
+        'id_us': mensaje[0],
+        'contenido': mensaje[1],
+        'fec_envio': mensaje[2]
+    } for mensaje in mensajes]
+
+    return render(request, 'chatear.html', {
+        'mensajes': mensajes_dict,
+        'id_us': id_us,
+        'nombre_usuario': nombre_usuario,
+        'apellido_usuario': apellido_usuario
+    })
+
+
+
+
+def enviar_mensaje(request, id_us):
+    # Obtengo el doc del usuario logueado
+    documento = request.session.get('documento')
+
+    if request.method == 'POST':
+        contenido = request.POST['contenido']
+        fecha_env = datetime.now().strftime('%Y-%m-%d')
+
+        with connection.cursor() as cursor:
+            cursor.execute("""
+                INSERT INTO mensaje (id_us, id_us2, contenido, fec_envio)
+                VALUES (%s, %s, %s, %s)
+            """, [documento, id_us, contenido, fecha_env])
+        
+            messages.success(request, "Mensaje enviado exitosamente.")
+            return redirect('chatear', id_us=id_us)  # Redirige de nuevo a la página de chat del usuario
+
+    return render(request, 'chatear.html')
 
 
 def cerrar_sesion(request):
