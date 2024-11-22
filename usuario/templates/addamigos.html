@@ -248,7 +248,7 @@
                 <div class="student-actions">
                     <a href="{% url 'ver_perfil' usuario.id_us %}" class="btn btn-profile">Ver Perfil</a>
                     <a href="{% url 'chatear' usuario.id_us %}" class="btn btn-chat">Chatear</a>
-                    <a class="btn btn-add-friend">Añadir Amigo</a>
+                    <a href="{% url 'addamigo' usuario.id_us%}" class="btn btn-add-friend">Añadir Amigo</a>
                 </div>
             </li>
             {% empty %}

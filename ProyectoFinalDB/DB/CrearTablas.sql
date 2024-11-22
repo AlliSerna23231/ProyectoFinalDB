@@ -31,6 +31,7 @@ CREATE TABLE ME_GUSTA(
     id_megusta int AUTO_INCREMENT PRIMARY KEY,
     id_us int,
     id_publicacion int,
+    estado numeric,
     CONSTRAINT fk_megusta_id_us FOREIGN KEY (id_us) REFERENCES USUARIO(id_us),
     CONSTRAINT fd_megusta_id_publicacion FOREIGN KEY (id_publicacion) REFERENCES PUBLICACION(id_publicacion)
 );

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil de Usuario - Social Link</title>
+    <title>Perfil de {{ usuario.nombre }} {{ usuario.apellido }} - Social Link</title>
     <style>
         body {
             font-family: 'Quicksand', sans-serif;
@@ -281,22 +281,29 @@
                 </form>
             </section>
 
+            {% if publicaciones %}
             {% for publicacion in publicaciones %}
             <article class="post">
                 <h2>{{ publicacion.titulo }}</h2> <!-- Título -->
                 <p>{{ publicacion.contenido }}</p> <!-- Contenido -->
                 <p>
-                    <small>Publicado el {{ publicacion.fecha }} a las {{ publicacion.hora }}</small>
+                    <small>Publicado el {{ publicacion.fecha_pub }} a las {{ publicacion.hora_pub }}</small>
                 </p> <!-- Fecha y Hora -->
                 <div class="post-actions">
-                    <button class="button" aria-label="Me gusta a esta publicación">Me gusta</button>
-                    <button class="button" aria-label="Comentar en esta publicación">Comentar</button>
+                    <a href="{% url 'me_gusta' publicacion.id_publicacion %}" class="button">
+                        {% if publicacion.me_gusta %}
+                        Quitar Me gusta
+                        {% else %}
+                        Me gusta
+                        {% endif %}
+                    </a> 
+                    <a href="{% url 'comentar' publicacion.id_publicacion %}" class="button" aria-label="Comentar en esta publicación">Comentar</a>
                 </div>
             </article>
-            {% empty %}
-            <p>No tienes publicaciones.</p>
             {% endfor %}
-
+            {% else %}
+            <p>No hay publicaciones.</p>
+            {% endif %}
         </main>
     </div>
 

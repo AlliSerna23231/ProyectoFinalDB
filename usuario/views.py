@@ -105,8 +105,34 @@ def home(request):
                     'edad': edad,
                     'ubicacion': ubicacion,
                 }
+    publicaciones = []  #lista
+    
+    with connection.cursor() as cursor:
+        query = """
+            SELECT titulo, contenido, fecha_pub, hora_pub, id_publicacion
+            FROM publicacion
+            WHERE id_us = %s
+        """
+        cursor.execute(query, [documento])  
+        results = cursor.fetchall()  # Obtiene todos los resultados
+        
+        # Verifica si se obtuvieron resultados
+        if not results:
+            print("No se encontraron publicaciones para el documento:", documento)
+        
+        # Formateamos la fecha antes de agregarla a la lista
+        publicaciones = [
+            {
+                'titulo': row[0],
+                'contenido': row[1],
+                'fecha_pub': row[2].strftime('%d/%m/%Y') if row[2] else None,  # Formatea la fecha
+                'hora_pub': row[3],
+                'id_publicacion': row[4]
+            }
+            for row in results
+        ]
 
-    return render(request, 'home.html', {'usuario': usuario})
+    return render(request, 'home.html', {'usuario': usuario, 'publicaciones': publicaciones})
 
 
 
@@ -138,29 +164,89 @@ def publicar(request):
     return render(request, 'home.html')
 
 
+from datetime import datetime
+
+
 def mostrar_publicacion(request):
-    documento = request.session.get('documento')  
+    documento = request.session.get('documento')  # Obtienemos el documento del usuario logueado
     
-    publicaciones = []  
+    if not documento:
+        print("No se encontró documento en la sesión.")
+        return render(request, 'home.html', {'publicaciones': []})  
     
-    if documento:
-        with connection.cursor() as cursor:
-            query = """
-                SELECT titulo, contenido, fech_pub, hora_pub
-                FROM publicacion
-                WHERE id_us = %s
-            """
-            cursor.execute(query, [documento])  
-            results = cursor.fetchall()  
-            
-            publicaciones = [
-                {'titulo': row[0], 'contenido': row[1], 'fecha': row[2], 'hora': row[3]}
-                for row in results
-            ]
+    publicaciones = []  # Lista de publicaciones
     
-            print('publiii que hay: ', publicaciones)
-    # Renderiza la plantilla y pasa las publicaciones al contexto
+    with connection.cursor() as cursor:
+        query = """
+            SELECT p.titulo, p.contenido, p.fecha_pub, p.hora_pub, p.id_publicacion
+            FROM publicacion p
+            WHERE p.id_us = %s
+        """
+        cursor.execute(query, [documento])  
+        results = cursor.fetchall()  
+        
+        if not results:
+            print("No se encontraron publicaciones para el documento:", documento)
+        
+        # Formateamos la fecha antes de agregarla a la lista
+        publicaciones = [
+            {
+                'titulo': row[0],
+                'contenido': row[1],
+                'fecha_pub': row[2].strftime('%d/%m/%Y') if row[2] else None,
+                'hora_pub': row[3],
+                'id_publicacion': row[4]
+            }
+            for row in results
+        ]
+
     return render(request, 'home.html', {'publicaciones': publicaciones})
+
+
+def me_gusta(request, id_publicacion):
+    documento = request.session.get('documento')  
+
+    if not documento:
+        messages.error(request, "Debes iniciar sesión para dar 'Me gusta'.")
+        return redirect('login')  
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_megusta, estado
+            FROM ME_GUSTA
+            WHERE id_us = %s AND id_publicacion = %s
+        """, [documento, id_publicacion])
+
+        result = cursor.fetchone()
+
+        if result:
+            id_megusta, estado = result
+            new_estado = 0 if estado == 1 else 1
+
+            cursor.execute("""
+                UPDATE ME_GUSTA
+                SET estado = %s
+                WHERE id_megusta = %s
+            """, [new_estado, id_megusta])
+
+            if new_estado == 1:
+                messages.success(request, "¡Te ha gustado esta publicación!")
+            else:
+                messages.success(request, "Has quitado tu 'Me gusta' de esta publicación.")
+        else:
+            cursor.execute("""
+                INSERT INTO ME_GUSTA (id_us, id_publicacion, estado)
+                VALUES (%s, %s, 1)
+            """, [documento, id_publicacion])
+
+            messages.success(request, "¡Te ha gustado esta publicación!")
+
+    return redirect('mostrar_publicacion')  
+
+
+def comentar(request, id_publicacion):
+    return render(request, 'home.html')
+
 
 def buscar_amigos(request):
     documento = request.session.get('documento')  
@@ -218,8 +304,33 @@ def ver_perfil(request, id_us):
                     'edad': edad,
                     'ubicacion': ubicacion,
                 }
+        publicaciones = []  # Lista de publicaciones
+    
+    with connection.cursor() as cursor:
+        query = """
+            SELECT p.titulo, p.contenido, p.fecha_pub, p.hora_pub, p.id_publicacion
+            FROM publicacion p
+            WHERE p.id_us = %s
+        """
+        cursor.execute(query, [id_us])  
+        results = cursor.fetchall()  
+        
+        if not results:
+            print("No se encontraron publicaciones para el documento:", id_us)
+        
+        # Formateamos la fecha antes de agregarla a la lista
+        publicaciones = [
+            {
+                'titulo': row[0],
+                'contenido': row[1],
+                'fecha_pub': row[2].strftime('%d/%m/%Y') if row[2] else None,
+                'hora_pub': row[3],
+                'id_publicacion': row[4]
+            }
+            for row in results
+        ]
 
-    return render(request, 'verperfil.html', {'usuario': usuario})
+    return render(request, 'verperfil.html', {'usuario': usuario, 'publicaciones': publicaciones})
 
 def chatear(request, id_us):
     # Obtengo el documento del usuario logueado
@@ -286,6 +397,11 @@ def enviar_mensaje(request, id_us):
             return redirect('chatear', id_us=id_us)  # Redirige de nuevo a la página de chat del usuario
 
     return render(request, 'chatear.html')
+
+
+def addamigo(request, id_us):
+    return render(request, 'addamigos.html')
+
 
 
 def cerrar_sesion(request):
