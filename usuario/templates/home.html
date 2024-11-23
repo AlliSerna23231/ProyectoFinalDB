@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario - Social Link</title>
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #FFF5E6;
+            color: #4A4A4A;
+        }
+
+        .navbar {
+            background-color: #FFB347;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #FF8C00;
+        }
+
+        .profile-header {
+            background-color: #FFDAB9;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .profile-pic {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid #FFB347;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-name {
+            font-size: 28px;
+            margin: 15px 0;
+            color: #FF8C00;
+        }
+
+        .profile-info {
+            font-size: 18px;
+            color: #4A4A4A;
+        }
+
+        .content {
+            display: flex;
+            margin: 30px 20px;
+            gap: 30px;
+        }
+
+        .left-sidebar {
+            flex: 1;
+            background-color: #FFE4B5;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content {
+            flex: 2;
+        }
+
+        .post-form,
+        .post {
+            background-color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+
+        .button {
+            background-color: #FFB347;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #FF8C00;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #FFE4B5;
+            border-radius: 15px;
+            font-size: 16px;
+            resize: none;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #FFE4B5;
+            border-radius: 15px;
+            font-size: 16px;
+            resize: vertical;
+        }
+
+        h2 {
+            color: #FF8C00;
+            border-bottom: 2px solid #FFB347;
+            padding-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+
+            .left-sidebar,
+            .main-content {
+                width: 100%;
+            }
+        }
+
+        #alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 1000;
+        }
+
+        .alert-custom {
+            background-color: #f3e5f5;
+            border: 1px solid #ce93d8;
+            color: #4a148c;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .alert-custom .btn-close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            padding: 0;
+            background: transparent;
+            border: 0;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+            color: #4a148c;
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .alert-custom .btn-close:hover {
+            opacity: 1;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            border-color: #a5d6a7;
+            color: #1b5e20;
+        }
+
+        .alert-info {
+            background-color: #e3f2fd;
+            border-color: #90caf9;
+            color: #0d47a1;
+        }
+
+        .alert-warning {
+            background-color: #fff3e0;
+            border-color: #ffcc80;
+            color: #e65100;
+        }
+
+        .alert-danger {
+            background-color: #ffebee;
+            border-color: #ef9a9a;
+            color: #b71c1c;
+        }
+
+        /* Animación de fade */
+        .fade {
+            transition: opacity 0.15s linear;
+        }
+
+        .fade:not(.show) {
+            opacity: 0;
+        }
+
+
+        /* Estilos para dispositivos móviles */
+        @media (max-width: 576px) {
+            #alert-container {
+                width: calc(100% - 40px);
+                right: 20px;
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="alert-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-custom" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    <nav class="navbar">
+        <div>
+            <a href="{% url 'home' %}" aria-label="Ir al Feed">Feed</a>
+            <a href="{% url 'buscar_amigos' %}" aria-label="Ir a buscar amigos">Buscar amigos</a>
+
+        </div>
+        <div>
+            <a href="{% url 'cerrar_sesion' %}" aria-label="Cerrar Sesión">Cerrar Sesión</a>
+        </div>
+    </nav>
+
+    <header class="profile-header">
+        <img src="https://via.placeholder.com/180" alt="Foto de perfil" class="profile-pic">
+        <h1 class="profile-name">{{ usuario.nombre }} {{ usuario.apellido }}</h1> <!-- Nombre y Apellido -->
+        <p class="profile-info">{{ usuario.fecha_nac }}</p> <!-- Fecha de Nacimiento -->
+    </header>
+
+    <div class="content">
+        <aside class="left-sidebar">
+            <h2>Información Personal</h2>
+            <p><strong>Edad:</strong> {{ usuario.edad }}</p> <!-- Edad -->
+            <p><strong>Correo:</strong> {{ usuario.correo }}</p> <!-- Correo -->
+            <p><strong>Ubicación:</strong> {{ usuario.ubicacion }}</p> <!-- Ubicación -->
+            <h2>Amigos</h2>
+            {% if amigos %}
+            <ul>
+                {% for amigo in amigos %}
+                <li>{{ amigo.nombre }} {{ amigo.apellido }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No tienes amigos registrados aún.</p>
+            {% endif %}
+
+        </aside>
+
+        <main class="main-content">
+            <section class="post-form">
+                <form action="{% url 'publicar' %}" method="post">
+                    {% csrf_token %}
+                    <h2>Crear Publicación</h2>
+                    <input type="text" name="titulo" placeholder="Título de tu publicación"
+                        aria-label="Título de la publicación">
+                    <textarea name="contenido" placeholder="¿Qué estás pensando?"
+                        aria-label="Contenido de la publicación"></textarea>
+                    <button class="button" aria-label="Publicar estado">Publicar</button>
+                </form>
+            </section>
+
+
+            {% if publicaciones %}
+            {% for publicacion in publicaciones %}
+            <article class="post">
+                <h2>{{ publicacion.titulo }}</h2> <!-- Título -->
+                <p>{{ publicacion.contenido }}</p> <!-- Contenido -->
+                <p>
+                    <small>Publicado el {{ publicacion.fecha_pub }} a las {{ publicacion.hora_pub }}</small>
+                </p> <!-- Fecha y Hora -->
+                <div class="post-actions">
+                    <a href="{% url 'me_gusta' publicacion.id_publicacion %}" class="button">
+                        {% if publicacion.me_gusta %}
+                        Quitar Me gusta
+                        {% else %}
+                        Me gusta
+                        {% endif %}
+                    </a>
+                    <a href="{% url 'comentar' publicacion.id_publicacion %}" class="button"
+                        aria-label="Comentar en esta publicación">Comentar</a>
+                </div>
+            </article>
+            {% endfor %}
+            {% else %}
+            <p>No hay publicaciones.</p>
+            {% endif %}
+
+
+
+
+
+
+        </main>
+    </div>
+
+
+</body>
+
+</html>

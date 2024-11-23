@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat - Social Link</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFF5E6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-container {
+            background-color: #FFDAB9;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+
+        .chat-header {
+            background-color: #FFA07A;
+            color: white;
+            padding: 15px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+            display: flex;
+            align-items: center;
+        }
+
+        .chat-header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .back-arrow {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: white;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+        }
+
+        .message-content {
+            padding: 10px;
+            border-radius: 15px;
+            margin: 0 0 5px 0;
+        }
+
+        .message-time {
+            font-size: 0.8rem;
+            color: #FF8C00;
+        }
+
+        .received .message-content {
+            background-color: #FFE4B5;
+            color: #FF7F50;
+            border-top-left-radius: 0;
+        }
+
+        .sent {
+            margin-left: auto;
+        }
+
+        .sent .message-content {
+            background-color: #FF9966;
+            color: white;
+            border-top-right-radius: 0;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: #FFE4B5;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            margin-right: 10px;
+            background-color: white;
+        }
+
+        .chat-input button {
+            background-color: #FF7F50;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background-color: #FF6347;
+        }
+
+        #alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 1000;
+        }
+
+        .alert-custom {
+            background-color: #f3e5f5;
+            border: 1px solid #ce93d8;
+            color: #4a148c;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .alert-custom .btn-close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            padding: 0;
+            background: transparent;
+            border: 0;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+            color: #4a148c;
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .alert-custom .btn-close:hover {
+            opacity: 1;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            border-color: #a5d6a7;
+            color: #1b5e20;
+        }
+
+        .alert-info {
+            background-color: #e3f2fd;
+            border-color: #90caf9;
+            color: #0d47a1;
+        }
+
+        .alert-warning {
+            background-color: #fff3e0;
+            border-color: #ffcc80;
+            color: #e65100;
+        }
+
+        .alert-danger {
+            background-color: #ffebee;
+            border-color: #ef9a9a;
+            color: #b71c1c;
+        }
+
+        @media (max-width: 480px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .chat-header {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="alert-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-custom" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="chat-container">
+        <div class="chat-header">
+            <a href="{% url 'buscar_amigos' %}" class="back-arrow"><i class="fas fa-arrow-left"></i></a>
+            <h1>Chat con {{ nombre_usuario }} {{ apellido_usuario }}</h1>
+        </div>
+        <div class="chat-messages">
+            {% for mensaje in mensajes %}
+            <div class="message {% if mensaje.id_us == documento %}sent{% else %}received{% endif %}">
+                <p class="message-content">{{ mensaje.contenido }}</p>
+                <span class="message-time">{{ mensaje.fec_envio }}</span>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="chat-input">
+            <form action="{% url 'enviar_mensaje' id_us %}" method="post">
+                {% csrf_token %}
+                <input name="contenido" type="text" placeholder="Escribe un mensaje..." aria-label="Escribe un mensaje">
+                <button type="submit">Enviar</button>
+            </form>
+        </div>
+    </div>    
+</body>
+</html>

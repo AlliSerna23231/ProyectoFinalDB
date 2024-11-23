@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Amigos - Social Link</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #FFF5E6;
+        margin: 0;
+        padding: 0;
+    }
+
+    .navbar {
+        background-color: #FFB347;
+        color: white;
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar a {
+        color: white;
+        text-decoration: none;
+        margin: 0 15px;
+        font-weight: bold;
+        transition: color 0.3s ease;
+    }
+
+    .navbar a:hover {
+        color: #FF8C00;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    h1 {
+        color: #FF8C00;
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .student-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .student-item {
+        background-color: #FFDAB9;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+    .student-item:hover {
+        box-shadow: 0 5px 15px rgba(255, 140, 0, 0.2);
+        transform: translateY(-5px);
+    }
+
+    .student-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-right: 20px;
+    }
+
+    .student-info {
+        flex-grow: 1;
+    }
+
+    .student-info h2 {
+        color: #FF8C00;
+        margin: 0 0 5px 0;
+    }
+
+    .student-info p {
+        color: #FF7F50;
+        margin: 0;
+    }
+
+    .student-actions {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-profile {
+        background-color: #FFA07A;
+        color: white;
+        margin-bottom: 10px;
+    }
+
+    .btn-profile:hover {
+        background-color: #FF7F50;
+    }
+
+    .btn-add-friend {
+        background-color: #FFD700;
+        color: #FF8C00;
+    }
+
+    .btn-add-friend:hover {
+        background-color: #FFA500;
+        color: white;
+    }
+
+    @media (max-width: 600px) {
+        .student-item {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .student-avatar {
+            margin-right: 0;
+            margin-bottom: 15px;
+        }
+
+        .student-actions {
+            margin-top: 15px;
+        }
+
+        #alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 1000;
+        }
+
+        .alert-custom {
+            background-color: #f3e5f5;
+            border: 1px solid #ce93d8;
+            color: #4a148c;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .alert-custom .btn-close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            padding: 0;
+            background: transparent;
+            border: 0;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+            color: #4a148c;
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .alert-custom .btn-close:hover {
+            opacity: 1;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            border-color: #a5d6a7;
+            color: #1b5e20;
+        }
+
+        .alert-info {
+            background-color: #e3f2fd;
+            border-color: #90caf9;
+            color: #0d47a1;
+        }
+
+        .alert-warning {
+            background-color: #fff3e0;
+            border-color: #ffcc80;
+            color: #e65100;
+        }
+
+        .alert-danger {
+            background-color: #ffebee;
+            border-color: #ef9a9a;
+            color: #b71c1c;
+        }
+
+        .btn-chat {
+            background-color: #98FB98;
+            color: #228B22;
+        }
+
+        .btn-chat:hover {
+            background-color: #90EE90;
+            color: #006400;
+        }
+
+    }
+</style>
+
+<body>
+    <div id="alert-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-custom" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    <nav class="navbar">
+        <div>
+            <a href="{% url 'home' %}" aria-label="Ir al Feed">Feed</a>
+            <a href="{% url 'buscar_amigos' %}" aria-label="Ir a buscar amigos">Buscar amigos</a>
+
+        </div>
+        <div>
+            <a href="{% url 'cerrar_sesion' %}" aria-label="Cerrar Sesión">Cerrar Sesión</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h1>Usuarios</h1>
+        <ul class="student-list">
+            {% for usuario in usuarios %}
+            <li class="student-item">
+                <img src="https://i.pravatar.cc/150?u={{ usuario.correo }}" alt="Foto de perfil" class="student-avatar">
+                <div class="student-info">
+                    <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+                    <p>{{ usuario.ubicacion }}</p>
+                </div>
+                <div class="student-actions">
+                    <a href="{% url 'ver_perfil' usuario.id_us %}" class="btn btn-profile">Ver Perfil</a>
+                    <a href="{% url 'chatear' usuario.id_us %}" class="btn btn-chat">Chatear</a>
+                    <a href="{% url 'addamigo' usuario.id_us%}" class="btn btn-add-friend">Añadir Amigo</a>
+                </div>
+            </li>
+            {% empty %}
+            <p>No se encontraron usuarios.</p>
+            {% endfor %}
+        </ul>
+    </div>
+
+</body>
+
+</html>

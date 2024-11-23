@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Link</title>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .container {
+        background-color: #ffffff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 400px;
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: #666;
+    }
+
+    input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    button {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    #alert-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 300px;
+        z-index: 1000;
+    }
+
+    .alert-custom {
+        background-color: #f3e5f5;
+        border: 1px solid #ce93d8;
+        color: #4a148c;
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.4;
+        position: relative;
+    }
+
+    .alert-custom .btn-close {
+        position: absolute;
+        top: 8px;
+        right: 10px;
+        padding: 0;
+        background: transparent;
+        border: 0;
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 1;
+        color: #4a148c;
+        opacity: 0.5;
+        cursor: pointer;
+    }
+
+    .alert-custom .btn-close:hover {
+        opacity: 1;
+    }
+
+    .alert-success {
+        background-color: #e8f5e9;
+        border-color: #a5d6a7;
+        color: #1b5e20;
+    }
+
+    .alert-info {
+        background-color: #e3f2fd;
+        border-color: #90caf9;
+        color: #0d47a1;
+    }
+
+    .alert-warning {
+        background-color: #fff3e0;
+        border-color: #ffcc80;
+        color: #e65100;
+    }
+
+    .alert-danger {
+        background-color: #ffebee;
+        border-color: #ef9a9a;
+        color: #b71c1c;
+    }
+
+    /* Animación de fade */
+    .fade {
+        transition: opacity 0.15s linear;
+    }
+
+    .fade:not(.show) {
+        opacity: 0;
+    }
+
+    /* Estilos para dispositivos móviles */
+    @media (max-width: 576px) {
+        #alert-container {
+            width: calc(100% - 40px);
+            right: 20px;
+            left: 20px;
+        }
+    }
+</style>
+
+<body>
+    <div id="alert-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-custom" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="container">
+        <h1>Iniciar Sesión</h1>
+        <form action="{% url 'iniciosesion' %}" method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="correo">Correo electrónico:</label>
+                <input type="email" id="correo" name="correo" required maxlength="100">
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required maxlength="250">
+            </div>
+            <div class="form-group">
+                <button type="submit">Iniciar</button>
+            </div>
+            <a href="{% url 'registro' %}">Crear Cuenta</a>
+        </form>
+    </div>
+</body>
+
+</html>
