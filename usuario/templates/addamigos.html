@@ -240,6 +240,8 @@
         <ul class="student-list">
             {% for usuario in usuarios %}
             <li class="student-item">
+                <!--El servicio gratuito pravatar nos genera imgs de perfil aleatorias con el correo del usuario --> 
+                <!--Se genera utilizando el correo como "semilla" para generar una img fija-->
                 <img src="https://i.pravatar.cc/150?u={{ usuario.correo }}" alt="Foto de perfil" class="student-avatar">
                 <div class="student-info">
                     <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>

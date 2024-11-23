@@ -92,6 +92,25 @@ def home(request):
             cursor.execute(query, [documento])  
             result = cursor.fetchone()  
 
+            cursor.execute("""
+                SELECT 
+                    CASE 
+                        WHEN a.id_us = %s THEN u2.nombre 
+                        ELSE u1.nombre 
+                    END AS nombre_amigo,
+                    CASE 
+                        WHEN a.id_us = %s THEN u2.apellido 
+                        ELSE u1.apellido 
+                    END AS apellido_amigo
+                FROM amistad a
+                LEFT JOIN usuario u1 ON a.id_us = u1.id_us
+                LEFT JOIN usuario u2 ON a.id_us2 = u2.id_us
+                WHERE a.id_us = %s OR a.id_us2 = %s
+            """, [documento, documento, documento, documento])
+            amigos = cursor.fetchall()
+
+
+
             if result:
                 nombre, apellido, correo, fecha_nac, ubicacion = result
                 today = date.today()
@@ -131,8 +150,10 @@ def home(request):
             }
             for row in results
         ]
+        amigos_list = [{'nombre': amigo[0], 'apellido': amigo[1]} for amigo in amigos]
 
-    return render(request, 'home.html', {'usuario': usuario, 'publicaciones': publicaciones})
+
+    return render(request, 'home.html', {'usuario': usuario, 'publicaciones': publicaciones, 'amigos': amigos_list})
 
 
 
@@ -291,6 +312,23 @@ def ver_perfil(request, id_us):
             cursor.execute(query, [id_us])  
             result = cursor.fetchone()  
 
+            cursor.execute("""
+                SELECT 
+                    CASE 
+                        WHEN a.id_us = %s THEN u2.nombre 
+                        ELSE u1.nombre 
+                    END AS nombre_amigo,
+                    CASE 
+                        WHEN a.id_us = %s THEN u2.apellido 
+                        ELSE u1.apellido 
+                    END AS apellido_amigo
+                FROM amistad a
+                LEFT JOIN usuario u1 ON a.id_us = u1.id_us
+                LEFT JOIN usuario u2 ON a.id_us2 = u2.id_us
+                WHERE a.id_us = %s OR a.id_us2 = %s
+            """, [id_us, id_us, id_us, id_us])
+            amigos = cursor.fetchall()
+
             if result:
                 nombre, apellido, correo, fecha_nac, ubicacion = result
                 today = date.today()
@@ -329,8 +367,10 @@ def ver_perfil(request, id_us):
             }
             for row in results
         ]
+        amigos_list = [{'nombre': amigo[0], 'apellido': amigo[1]} for amigo in amigos]
 
-    return render(request, 'verperfil.html', {'usuario': usuario, 'publicaciones': publicaciones})
+
+    return render(request, 'verperfil.html', {'usuario': usuario, 'publicaciones': publicaciones, 'amigos': amigos_list})
 
 
 def chatear(request, id_us):
@@ -433,35 +473,6 @@ def addamigo(request, id_us):
         
 
     return render(request, 'addamigos.html')
-
-def mostrar_amigos(request):
-    documento = request.session.get('documento')
-
-    if not documento:
-        return redirect('iniciosesion')
-
-    with connection.cursor() as cursor:
-        # Consulta para obtener amigos cubriendo ambos casos
-        cursor.execute("""
-            SELECT u.nombre, u.apellido
-            FROM amistad a
-            INNER JOIN usuario u ON a.id_us2 = u.id_us
-            WHERE a.id_us = %s
-            UNION
-            SELECT u.nombre, u.apellido
-            FROM amistad a
-            INNER JOIN usuario u ON a.id_us = u.id_us
-            WHERE a.id_us2 = %s
-        """, [documento, documento])
-        amigos = cursor.fetchall()
-
-    if not amigos:
-        amigos_list = []
-    else:
-        amigos_list = [{'nombre': amigo[0], 'apellido': amigo[1]} for amigo in amigos]
-
-    return render(request, 'home.html', {'amigos': amigos_list})
-
 
 
 def cerrar_sesion(request):
