@@ -267,6 +267,16 @@
             <p><strong>Correo:</strong> {{ usuario.correo }}</p> <!-- Correo -->
             <p><strong>Ubicación:</strong> {{ usuario.ubicacion }}</p> <!-- Ubicación -->
             <h2>Amigos</h2>
+            {% if amigos %}
+            <ul>
+                {% for amigo in amigos %}
+                <li>{{ amigo.nombre }} {{ amigo.apellido }}</li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p>No tienes amigos registrados aún.</p>
+            {% endif %}
+
         </aside>
 
         <main class="main-content">
@@ -298,8 +308,9 @@
                         {% else %}
                         Me gusta
                         {% endif %}
-                    </a> 
-                    <a href="{% url 'comentar' publicacion.id_publicacion %}" class="button" aria-label="Comentar en esta publicación">Comentar</a>
+                    </a>
+                    <a href="{% url 'comentar' publicacion.id_publicacion %}" class="button"
+                        aria-label="Comentar en esta publicación">Comentar</a>
                 </div>
             </article>
             {% endfor %}

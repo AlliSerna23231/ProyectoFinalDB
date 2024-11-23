@@ -212,7 +212,7 @@
         </div>
         <div class="chat-messages">
             {% for mensaje in mensajes %}
-            <div class="message {% if mensaje.id_us == id_us %}sent{% else %}received{% endif %}">
+            <div class="message {% if mensaje.id_us == documento %}sent{% else %}received{% endif %}">
                 <p class="message-content">{{ mensaje.contenido }}</p>
                 <span class="message-time">{{ mensaje.fec_envio }}</span>
             </div>
@@ -225,6 +225,6 @@
                 <button type="submit">Enviar</button>
             </form>
         </div>
-    </div>
+    </div>    
 </body>
 </html>

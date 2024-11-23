@@ -332,6 +332,7 @@ def ver_perfil(request, id_us):
 
     return render(request, 'verperfil.html', {'usuario': usuario, 'publicaciones': publicaciones})
 
+
 def chatear(request, id_us):
     # Obtengo el documento del usuario logueado
     documento = request.session.get('documento')
@@ -343,18 +344,21 @@ def chatear(request, id_us):
         cursor.execute("""
             SELECT id_us, contenido, fec_envio
             FROM mensaje
-            WHERE (id_us = %s AND id_us2 = %s) OR (id_us = %s AND id_us2 = %s)
+            WHERE 
+            (id_us = %s AND id_us2 = %s)  
+            OR 
+            (id_us = %s AND id_us2 = %s)
             ORDER BY fec_envio
         """, [documento, id_us, id_us, documento])
         mensajes = cursor.fetchall()
 
+        #Sacamos el nombre y apellido del usuario seleccionado para mostrarlo en el template
         cursor.execute("""
             SELECT nombre, apellido
             FROM usuario
             WHERE id_us = %s
         """, [id_us])
         usuario_seleccionado = cursor.fetchone()
-
 
         if usuario_seleccionado:
             nombre_usuario = usuario_seleccionado[0]
@@ -372,6 +376,7 @@ def chatear(request, id_us):
     return render(request, 'chatear.html', {
         'mensajes': mensajes_dict,
         'id_us': id_us,
+        'documento': documento,  
         'nombre_usuario': nombre_usuario,
         'apellido_usuario': apellido_usuario
     })
@@ -394,13 +399,68 @@ def enviar_mensaje(request, id_us):
             """, [documento, id_us, contenido, fecha_env])
         
             messages.success(request, "Mensaje enviado exitosamente.")
-            return redirect('chatear', id_us=id_us)  # Redirige de nuevo a la página de chat del usuario
+            return redirect('chatear', id_us=id_us)  
 
     return render(request, 'chatear.html')
 
 
 def addamigo(request, id_us):
+    documento = request.session.get('documento')
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO amistad (id_us, id_us2)
+            VALUES (%s, %s)
+        """, [documento, id_us])
+
+        #Sacamos el nombre y apellido del usuario seleccionado para mostrarlo en el template
+        cursor.execute("""
+            SELECT nombre, apellido
+            FROM usuario
+            WHERE id_us = %s
+        """, [id_us])
+        usuario_seleccionado = cursor.fetchone()
+
+        if usuario_seleccionado:
+            nombre_usuario = usuario_seleccionado[0]
+            apellido_usuario = usuario_seleccionado[1]
+        else:
+            nombre_usuario = "Desconocido"
+            apellido_usuario = ""
+
+        messages.success(request, f"Tú y {nombre_usuario} {apellido_usuario} son amigos...")
+        return redirect('buscar_amigos')  
+        
+
     return render(request, 'addamigos.html')
+
+def mostrar_amigos(request):
+    documento = request.session.get('documento')
+
+    if not documento:
+        return redirect('iniciosesion')
+
+    with connection.cursor() as cursor:
+        # Consulta para obtener amigos cubriendo ambos casos
+        cursor.execute("""
+            SELECT u.nombre, u.apellido
+            FROM amistad a
+            INNER JOIN usuario u ON a.id_us2 = u.id_us
+            WHERE a.id_us = %s
+            UNION
+            SELECT u.nombre, u.apellido
+            FROM amistad a
+            INNER JOIN usuario u ON a.id_us = u.id_us
+            WHERE a.id_us2 = %s
+        """, [documento, documento])
+        amigos = cursor.fetchall()
+
+    if not amigos:
+        amigos_list = []
+    else:
+        amigos_list = [{'nombre': amigo[0], 'apellido': amigo[1]} for amigo in amigos]
+
+    return render(request, 'home.html', {'amigos': amigos_list})
 
 
 
