@@ -15,7 +15,6 @@ urlpatterns = [
     path('chatear/<int:id_us>/', views.chatear, name='chatear'),
     path('enviar_mensaje/<int:id_us>/', views.enviar_mensaje, name='enviar_mensaje'),
     path('addamigo/<int:id_us>/', views.addamigo, name='addamigo'),
-    path('mostrar_amigos/', views.mostrar_amigos, name='mostrar_amigos'),
 
 
 

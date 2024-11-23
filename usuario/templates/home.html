@@ -255,7 +255,7 @@
     </nav>
 
     <header class="profile-header">
-        <img src="https://via.placeholder.com/180" alt="Foto de perfil" class="profile-pic">
+        <img src="https://i.pravatar.cc/180?u={{ usuario.correo }}" alt="Foto de perfil" class="profile-pic">
         <h1 class="profile-name">{{ usuario.nombre }} {{ usuario.apellido }}</h1> <!-- Nombre y Apellido -->
         <p class="profile-info">{{ usuario.fecha_nac }}</p> <!-- Fecha de Nacimiento -->
     </header>
@@ -267,16 +267,11 @@
             <p><strong>Correo:</strong> {{ usuario.correo }}</p> <!-- Correo -->
             <p><strong>Ubicación:</strong> {{ usuario.ubicacion }}</p> <!-- Ubicación -->
             <h2>Amigos</h2>
-            {% if amigos %}
             <ul>
                 {% for amigo in amigos %}
-                <li>{{ amigo.nombre }} {{ amigo.apellido }}</li>
+                    <li>{{ amigo.nombre }} {{ amigo.apellido }}</li>
                 {% endfor %}
-            </ul>
-            {% else %}
-            <p>No tienes amigos registrados aún.</p>
-            {% endif %}
-
+            </ul>            
         </aside>
 
         <main class="main-content">
