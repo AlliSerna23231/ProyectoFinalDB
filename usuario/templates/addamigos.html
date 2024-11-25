@@ -5,139 +5,198 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Buscar Amigos - Social Link</title>
-</head>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #FFF5E6;
-        margin: 0;
-        padding: 0;
-    }
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #FFF5E6;
+            margin: 0;
+            padding: 0;
+        }
 
-    .navbar {
-        background-color: #FFB347;
-        color: white;
-        padding: 15px 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
+        .navbar {
+            background-color: #FFB347;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
 
-    .navbar a {
-        color: white;
-        text-decoration: none;
-        margin: 0 15px;
-        font-weight: bold;
-        transition: color 0.3s ease;
-    }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
 
-    .navbar a:hover {
-        color: #FF8C00;
-    }
+        .navbar a:hover {
+            color: #FF8C00;
+        }
 
-    .container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-    }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
 
-    h1 {
-        color: #FF8C00;
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .student-list {
-        list-style-type: none;
-        padding: 0;
-    }
-
-    .student-item {
-        background-color: #FFDAB9;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        transition: all 0.3s ease;
-    }
-
-    .student-item:hover {
-        box-shadow: 0 5px 15px rgba(255, 140, 0, 0.2);
-        transform: translateY(-5px);
-    }
-
-    .student-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin-right: 20px;
-    }
-
-    .student-info {
-        flex-grow: 1;
-    }
-
-    .student-info h2 {
-        color: #FF8C00;
-        margin: 0 0 5px 0;
-    }
-
-    .student-info p {
-        color: #FF7F50;
-        margin: 0;
-    }
-
-    .student-actions {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .btn {
-        padding: 10px 15px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-profile {
-        background-color: #FFA07A;
-        color: white;
-        margin-bottom: 10px;
-    }
-
-    .btn-profile:hover {
-        background-color: #FF7F50;
-    }
-
-    .btn-add-friend {
-        background-color: #FFD700;
-        color: #FF8C00;
-    }
-
-    .btn-add-friend:hover {
-        background-color: #FFA500;
-        color: white;
-    }
-
-    @media (max-width: 600px) {
-        .student-item {
-            flex-direction: column;
+        h1 {
+            color: #FF8C00;
             text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /*  buscador */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #FFB347;
+            border-radius: 5px 0 0 5px;
+            width: 300px;
+        }
+
+        .search-button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #FFB347;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-button:hover {
+            background-color: #FF8C00;
+        }
+
+        /* Resto de los estilos existentes */
+        .student-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .student-item {
+            background-color: #FFDAB9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .student-item:hover {
+            box-shadow: 0 5px 15px rgba(255, 140, 0, 0.2);
+            transform: translateY(-5px);
         }
 
         .student-avatar {
-            margin-right: 0;
-            margin-bottom: 15px;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+
+        .student-info {
+            flex-grow: 1;
+        }
+
+        .student-info h2 {
+            color: #FF8C00;
+            margin: 0 0 5px 0;
+        }
+
+        .student-info p {
+            color: #FF7F50;
+            margin: 0;
         }
 
         .student-actions {
-            margin-top: 15px;
+            display: flex;
+            flex-direction: column;
         }
 
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-profile {
+            background-color: #FFA07A;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .btn-profile:hover {
+            background-color: #FF7F50;
+        }
+
+        .btn-add-friend {
+            background-color: #FFD700;
+            color: #FF8C00;
+        }
+
+        .btn-add-friend:hover {
+            background-color: #FFA500;
+            color: white;
+        }
+
+        .btn-chat {
+            background-color: #98FB98;
+            color: #228B22;
+        }
+
+        .btn-chat:hover {
+            background-color: #90EE90;
+            color: #006400;
+        }
+
+        @media (max-width: 600px) {
+            .student-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .student-avatar {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .student-actions {
+                margin-top: 15px;
+            }
+
+            .search-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .search-input {
+                width: 100%;
+                max-width: 300px;
+                border-radius: 5px;
+                margin-bottom: 10px;
+            }
+
+            .search-button {
+                width: 100%;
+                max-width: 300px;
+                border-radius: 5px;
+            }
+            
+        }
         #alert-container {
             position: fixed;
             top: 20px;
@@ -203,18 +262,8 @@
             color: #b71c1c;
         }
 
-        .btn-chat {
-            background-color: #98FB98;
-            color: #228B22;
-        }
-
-        .btn-chat:hover {
-            background-color: #90EE90;
-            color: #006400;
-        }
-
-    }
-</style>
+    </style>
+</head>
 
 <body>
     <div id="alert-container">
@@ -228,20 +277,31 @@
     <nav class="navbar">
         <div>
             <a href="{% url 'home' %}" aria-label="Ir al Feed">Feed</a>
-            <a href="{% url 'buscar_amigos' %}" aria-label="Ir a buscar amigos">Buscar amigos</a>
-
+            <a href="{% url 'usuarios' %}" aria-label="Ir a buscar amigos">Buscar amigos</a>
+            <a href="{% url 'publicaciones' %}" aria-label="Publicaciones Recientes">Publicaciones</a>
         </div>
         <div>
             <a href="{% url 'cerrar_sesion' %}" aria-label="Cerrar Sesión">Cerrar Sesión</a>
         </div>
     </nav>
     <div class="container">
+        <!-- buscador de amigos -->
+        <div class="search-container">
+            <form action="{% url 'buscar_amigos' %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="amigo" class="search-input" placeholder="Buscar amigos">
+                <button type="submit" class="search-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </button>
+            </form>
+        </div>
         <h1>Usuarios</h1>
         <ul class="student-list">
             {% for usuario in usuarios %}
             <li class="student-item">
-                <!--El servicio gratuito pravatar nos genera imgs de perfil aleatorias con el correo del usuario --> 
-                <!--Se genera utilizando el correo como "semilla" para generar una img fija-->
                 <img src="https://i.pravatar.cc/150?u={{ usuario.correo }}" alt="Foto de perfil" class="student-avatar">
                 <div class="student-info">
                     <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
@@ -258,7 +318,7 @@
             {% endfor %}
         </ul>
     </div>
-
 </body>
 
 </html>
+

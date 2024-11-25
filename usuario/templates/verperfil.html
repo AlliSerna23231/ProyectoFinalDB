@@ -253,6 +253,10 @@
         <div>
             <a href="{% url 'home' %}" aria-label="Ir al Feed">Feed</a>
             <a href="{% url 'buscar_amigos' %}" aria-label="Ir a buscar amigos">Buscar amigos</a>
+            <a href="{% url 'publicaciones' %}" aria-label="Publicaciones Recientes">Publicaciones</a>
+            <a href="{% url 'chatear' usuario.id_us %}" aria-label="Chatear">Chatear con {{ usuario.nombre }} {{ usuario.apellido }} </a>
+
+
 
         </div>
         <div>
@@ -281,17 +285,7 @@
         </aside>
 
         <main class="main-content">
-            <section class="post-form">
-                <form action="{% url 'publicar' %}" method="post">
-                    {% csrf_token %}
-                    <h2>Crear Publicación</h2>
-                    <input type="text" name="titulo" placeholder="Título de tu publicación"
-                        aria-label="Título de la publicación">
-                    <textarea name="contenido" placeholder="¿Qué estás pensando?"
-                        aria-label="Contenido de la publicación"></textarea>
-                    <button class="button" aria-label="Publicar estado">Publicar</button>
-                </form>
-            </section>
+            <h2>Publicaciones</h2>
 
             {% if publicaciones %}
             {% for publicacion in publicaciones %}
@@ -302,7 +296,7 @@
                     <small>Publicado el {{ publicacion.fecha_pub }} a las {{ publicacion.hora_pub }}</small>
                 </p> <!-- Fecha y Hora -->
                 <div class="post-actions">
-                    <a href="{% url 'me_gusta' publicacion.id_publicacion %}" class="button">
+                    <a href="{% url 'me_gustaperfil' publicacion.id_publicacion %}" class="button">
                         {% if publicacion.me_gusta %}
                         Quitar Me gusta
                         {% else %}
