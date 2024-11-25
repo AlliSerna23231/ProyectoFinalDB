@@ -303,8 +303,9 @@
                         Me gusta
                         {% endif %}
                     </a>
-                    <a href="{% url 'comentar' publicacion.id_publicacion %}" class="button"
-                        aria-label="Comentar en esta publicación">Comentar</a>
+                    <a href="{% url 'contadorme_gustaperfil'  publicacion.id_publicacion %}" class="button">Contador</a>
+                    <a href="{% url 'comentarios' publicacion.id_publicacion %}" class="button">Mostrar comentarios</a>   
+
                 </div>
             </article>
             {% endfor %}

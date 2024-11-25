@@ -373,56 +373,8 @@
                         Me gusta
                         {% endif %}
                     </a>
-                    <a class="button" data-id="{{ publicacion.id_publicacion }}" onclick="openModal(this)">Comentar</a>
-
-                    <div id="modal-{{ publicacion.id_publicacion }}" class="modal">
-                        <div class="modal-content">
-                            <span class="close" data-id="{{ publicacion.id_publicacion }}"
-                                onclick="closeModal(this)">&times;</span>
-                            <h3>Comentarios para "{{ publicacion.titulo }}"</h3>
-
-                            <!-- Lista de comentarios -->
-                            <div class="comments-list">
-                                <a href="{% url 'comentarios' publicacion.id_publicacion %}" class="button">Mostrar
-                                    Come</a>
-                                <!-- Mostrar los comentarios -->
-                                {% if comentarios %}
-                                <ul>
-                                    {% for comentarios in comentarios %}
-                                    <li>
-                                        <strong>Usuario {{ comentario.id_us }}</strong>
-                                        <p>{{ comentario.contenido }}</p>
-                                        <small>Publicado el {{ comentario.fec_pub }}</small>
-                                    </li>
-                                    {% endfor %}
-                                </ul>
-                                {% else %}
-                                <p>No hay comentarios para esta publicación.</p>
-                                {% endif %}
-                            </div>
-
-                            <script>
-                                function openModal(element) {
-                                    const id = element.getAttribute('data-id');
-                                    document.getElementById('modal-' + id).style.display = 'block';
-                                }
-
-                                function closeModal(element) {
-                                    const id = element.getAttribute('data-id');
-                                    document.getElementById('modal-' + id).style.display = 'none';
-                                }
-
-                            </script>
-                            <!-- Formulario para agregar un comentario -->
-                            <form method="POST" action="{% url 'comentar' publicacion.id_publicacion %}">
-                                {% csrf_token %}
-                                <textarea name="comentario" rows="4" placeholder="Escribe tu comentario..."
-                                    required></textarea>
-                                <button type="submit" class="button">Enviar</button>
-                            </form>
-                        </div>
-                    </div>
-
+                    <a href="{% url 'contador_me_gusta'  publicacion.id_publicacion %}" class="button">Contador</a>
+                    <a href="{% url 'comentarios' publicacion.id_publicacion %}" class="button">Mostrar comentarios</a>   
                 </div>
             </article>
             {% endfor %}

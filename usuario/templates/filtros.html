@@ -195,8 +195,9 @@
                 max-width: 300px;
                 border-radius: 5px;
             }
-            
+
         }
+
         #alert-container {
             position: fixed;
             top: 20px;
@@ -262,9 +263,118 @@
             color: #b71c1c;
         }
 
+        .sidebar {
+            width: 250px;
+            background-color: #FFE4B5;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 60px;
+            bottom: 0;
+            left: -250px; /* Inicialmente oculto */
+            overflow-y: auto;
+            transition: left 0.3s ease-in-out;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .toggle-sidebar {
+            position: fixed;
+            left: 10px;
+            top: 70px;
+            z-index: 1001;
+            background-color: #FFB347;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .sidebar h2 {
+            color: #FF8C00;
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-group input[type="number"],
+        .filter-group select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #FFB347;
+            border-radius: 5px;
+            background-color: #FFF5E6;
+            font-size: 14px;
+            color: #333;
+            margin-top: 5px;
+        }
+
+        .filter-group label {
+            font-weight: bold;
+            color: #FF7F50;
+        }
+
+        .filter-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #FFB347;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .filter-button:hover {
+            background-color: #FF8C00;
+        }
+
+        @media (max-width: 600px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                top: 0;
+                box-shadow: none;
+            }
+
+            .filter-group {
+                margin-bottom: 15px;
+            }
+
+            .filter-button {
+                width: 100%;
+            }
+        }
+        
     </style>
 </head>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleButton = document.getElementById('toggleSidebar');
 
+        toggleButton.addEventListener('click', function() {
+            sidebar.classList.toggle('open');
+            toggleButton.textContent = sidebar.classList.contains('open') ? '✕' : '☰';
+        });
+
+        // Cerrar el sidebar al hacer clic fuera de él
+        document.addEventListener('click', function(event) {
+            if (!sidebar.contains(event.target) && event.target !== toggleButton) {
+                sidebar.classList.remove('open');
+                toggleButton.textContent = '☰';
+            }
+        });
+    });
+</script>
 <body>
     <div id="alert-container">
         {% for message in messages %}
@@ -278,13 +388,40 @@
         <div>
             <a href="{% url 'home' %}" aria-label="Ir al Feed">Feed</a>
             <a href="{% url 'usuarios' %}" aria-label="Ir a buscar amigos">Buscar amigos</a>
-            <a href="{% url 'publicaciones' %}" aria-label="Filtros">Publicaciones</a>
-            <a href="{% url 'filtros' %}" aria-label="Filtros">Filtros</a>
+            <a href="{% url 'publicaciones' %}" aria-label="Publicaciones Recientes">Publicaciones</a>
         </div>
         <div>
             <a href="{% url 'cerrar_sesion' %}" aria-label="Cerrar Sesión">Cerrar Sesión</a>
         </div>
     </nav>
+    <button class="toggle-sidebar" id="toggleSidebar">☰</button>
+    <aside class="sidebar" id="sidebar">
+        <h2>Filtros de Búsqueda</h2>
+        <form method="GET" action="">
+            <div class="filter-group">
+                <label for="edad_min">Edad mínima:</label>
+                <input type="number" id="edad_min" name="edad_min" value="{{ edad_min }}" min="0" max="100"
+                    placeholder="Mín.">
+            </div>
+            <div class="filter-group">
+                <label for="edad_max">Edad máxima:</label>
+                <input type="number" id="edad_max" name="edad_max" value="{{ edad_max }}" min="0" max="100"
+                    placeholder="Máx.">
+            </div>
+            <div class="filter-group">
+                <label for="ciudad">Ubicación:</label>
+                <select id="ciudad" name="ciudad">
+                    <option value="">Todas las ubicaciones</option>
+                    {% for ciudad in ciudades %}
+                    <option value="{{ ciudad }}" {% if ciudad == ciudad_seleccionada %}selected{% endif %}>{{ ciudad }}</option>
+                </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="filter-button">Buscar</button>
+        </form>
+    </aside>
+
     <div class="container">
         <!-- buscador de amigos -->
         <div class="search-container">
@@ -292,7 +429,8 @@
                 {% csrf_token %}
                 <input type="text" name="amigo" class="search-input" placeholder="Buscar amigos">
                 <button type="submit" class="search-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="11" cy="11" r="8"></circle>
                         <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                     </svg>
@@ -322,4 +460,3 @@
 </body>
 
 </html>
-
