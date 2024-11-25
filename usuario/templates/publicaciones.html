@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Publicaciones Recientes</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .navbar {
+            background-color: #FFB347;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #FF8C00;
+        }
+
+        header {
+            background-color: #ff9933;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        .post {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(255, 153, 51, 0.2);
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-left: 4px solid #ff9933;
+        }
+
+        .post h2 {
+            color: #e67300;
+            margin-top: 0;
+        }
+
+        .content {
+            margin-bottom: 1rem;
+        }
+
+        .meta {
+            color: #ff8000;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: flex-start;
+            gap: 1rem;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: #ff9933;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #e67300;
+        }
+
+        .no-posts {
+            text-align: center;
+            color: #ff8000;
+            font-style: italic;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .student-avatar {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .user-details {
+            font-size: 0.9rem;
+        }
+
+        #alert-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 300px;
+            z-index: 1000;
+        }
+
+        .alert-custom {
+            background-color: #f3e5f5;
+            border: 1px solid #ce93d8;
+            color: #4a148c;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+        }
+
+        .alert-custom .btn-close {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            padding: 0;
+            background: transparent;
+            border: 0;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+            color: #4a148c;
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .alert-custom .btn-close:hover {
+            opacity: 1;
+        }
+
+        .alert-success {
+            background-color: #e8f5e9;
+            border-color: #a5d6a7;
+            color: #1b5e20;
+        }
+
+        .alert-info {
+            background-color: #e3f2fd;
+            border-color: #90caf9;
+            color: #0d47a1;
+        }
+
+        .alert-warning {
+            background-color: #fff3e0;
+            border-color: #ffcc80;
+            color: #e65100;
+        }
+
+        .alert-danger {
+            background-color: #ffebee;
+            border-color: #ef9a9a;
+            color: #b71c1c;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #333;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .comments-list {
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 1rem;
+        }
+
+        .comments-list .comment {
+            border-bottom: 1px solid #ddd;
+            padding: 0.5rem 0;
+        }
+
+        textarea {
+            width: 100%;
+            margin: 1rem 0;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="alert-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show alert-custom" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+    </div>
+    <nav class="navbar">
+        <div>
+            <a href="{% url 'home' %}" aria-label="Ir al Feed">Feed</a>
+            <a href="{% url 'usuarios' %}" aria-label="Ir a buscar amigos">Buscar amigos</a>
+            <a href="{% url 'publicaciones' %}" aria-label="Publicaciones Recientes">Publicaciones</a>
+        </div>
+        <div>
+            <a href="{% url 'cerrar_sesion' %}" aria-label="Cerrar Sesión">Cerrar Sesión</a>
+        </div>
+    </nav>
+    <header>
+        <h1>Publicaciones Recientes</h1>
+    </header>
+    <main>
+        {% if publicaciones %}
+        {% for publicacion in publicaciones %}
+        <article class="post">
+            <!-- Mostrar la información del usuario -->
+            <div class="user-info">
+                <img src="https://i.pravatar.cc/150?u={{ publicacion.correo_usuario }}" alt="Foto de perfil"
+                    class="student-avatar">
+                <div class="user-details">
+                    <a href="{% url 'ver_perfil' publicacion.id_us %}"><strong>{{ publicacion.nombre_usuario }} {{ publicacion.apellido_usuario }}</strong></a>
+                </div>
+            </div>
+
+            <h2>{{ publicacion.titulo }}</h2>
+            <p class="content">{{ publicacion.contenido }}</p>
+            <p class="meta">
+                <small>Publicado el {{ publicacion.fecha_pub }} a las {{ publicacion.hora_pub }}</small>
+            </p>
+            <div class="post-actions">
+                <a href="{% url 'me_gustapublicacion' publicacion.id_publicacion %}" class="button">
+                    {% if publicacion.me_gusta %}
+                    Quitar Me gusta
+                    {% else %}
+                    Me gusta
+                    {% endif %}
+                </a>
+                <a href="{% url 'contadorme_gustapublicacion'  publicacion.id_publicacion %}" class="button">Contador</a>
+                <a href="{% url 'comentarios' publicacion.id_publicacion %}" class="button">Mostrar comentarios</a>   
+            </div>
+        </article>
+        {% endfor %}
+        {% else %}
+        <p class="no-posts">No hay publicaciones.</p>
+        {% endif %}
+    </main>
+</body>
+
+</html>

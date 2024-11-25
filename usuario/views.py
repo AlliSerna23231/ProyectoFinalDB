@@ -262,14 +262,211 @@ def me_gusta(request, id_publicacion):
 
             messages.success(request, "¡Te ha gustado esta publicación!")
 
-    return redirect('mostrar_publicacion')  
+    return redirect('home')  
+
+
+
+def contador_me_gusta(request, id_publicacion):
+    documento = request.session.get('documento')  
+
+    if not documento:
+        messages.error(request, "Debes iniciar sesión para dar ver el conteo de me gustas.")
+        return redirect('login')  
+    
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM ME_GUSTA
+            WHERE id_publicacion = %s AND estado = 1
+        """, [id_publicacion])
+
+        result = cursor.fetchone()[0]  
+
+    messages.success(request, f"Hay {result} Me gusta en esta publicación.")
+
+    return redirect('home')  
+
+
+
+
+def me_gustapublicacion(request, id_publicacion):
+    documento = request.session.get('documento')  
+
+    if not documento:
+        messages.error(request, "Debes iniciar sesión para dar 'Me gusta'.")
+        return redirect('login')  
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_megusta, estado
+            FROM ME_GUSTA
+            WHERE id_us = %s AND id_publicacion = %s
+        """, [documento, id_publicacion])
+
+        result = cursor.fetchone()
+
+        if result:
+            id_megusta, estado = result
+            new_estado = 0 if estado == 1 else 1
+
+            cursor.execute("""
+                UPDATE ME_GUSTA
+                SET estado = %s
+                WHERE id_megusta = %s
+            """, [new_estado, id_megusta])
+
+            if new_estado == 1:
+                messages.success(request, "¡Te ha gustado esta publicación!")
+            else:
+                messages.success(request, "Has quitado tu 'Me gusta' de esta publicación.")
+        else:
+            cursor.execute("""
+                INSERT INTO ME_GUSTA (id_us, id_publicacion, estado)
+                VALUES (%s, %s, 1)
+            """, [documento, id_publicacion])
+
+            messages.success(request, "¡Te ha gustado esta publicación!")
+
+    return redirect('publicaciones') 
+
+
+def contadorme_gustapublicacion(request, id_publicacion):
+    documento = request.session.get('documento')  
+
+    if not documento:
+        messages.error(request, "Debes iniciar sesión para dar ver el conteo de me gustas.")
+        return redirect('login')  
+    
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM ME_GUSTA
+            WHERE id_publicacion = %s AND estado = 1
+        """, [id_publicacion])
+
+        result = cursor.fetchone()[0]  
+
+    messages.success(request, f"Hay {result} Me gusta en esta publicación.")
+
+    return redirect('publicaciones') 
+
+
+def me_gustaperfil(request, id_publicacion):
+    documento = request.session.get('documento')  
+
+    if not documento:
+        messages.error(request, "Debes iniciar sesión para dar 'Me gusta'.")
+        return redirect('login')  
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_megusta, estado
+            FROM ME_GUSTA
+            WHERE id_us = %s AND id_publicacion = %s
+        """, [documento, id_publicacion])
+
+        result = cursor.fetchone()
+
+        if result:
+            id_megusta, estado = result
+            new_estado = 0 if estado == 1 else 1
+
+            cursor.execute("""
+                UPDATE ME_GUSTA
+                SET estado = %s
+                WHERE id_megusta = %s
+            """, [new_estado, id_megusta])
+
+            if new_estado == 1:
+                messages.success(request, "¡Te ha gustado esta publicación!")
+            else:
+                messages.success(request, "Has quitado tu 'Me gusta' de esta publicación.")
+        else:
+            cursor.execute("""
+                INSERT INTO ME_GUSTA (id_us, id_publicacion, estado)
+                VALUES (%s, %s, 1)
+            """, [documento, id_publicacion])
+
+            messages.success(request, "¡Te ha gustado esta publicación!")
+
+    return redirect('usuarios') 
+
+
+def contadorme_gustaperfil(request, id_publicacion):
+    documento = request.session.get('documento')  
+
+    if not documento:
+        messages.error(request, "Debes iniciar sesión para dar ver el conteo de me gustas.")
+        return redirect('login')  
+    
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT COUNT(*)
+            FROM ME_GUSTA
+            WHERE id_publicacion = %s AND estado = 1
+        """, [id_publicacion])
+
+        result = cursor.fetchone()[0]  
+
+    messages.success(request, f"Hay {result} Me gusta en esta publicación.")
+
+    return redirect('usuarios') 
 
 
 def comentar(request, id_publicacion):
-    return render(request, 'home.html')
+    documento = request.session.get('documento')  
+
+    contenido = request.POST['comentario']
+    fec_pub = datetime.now().strftime('%Y-%m-%d')  
 
 
-def buscar_amigos(request):
+    if not documento:
+        messages.error(request, "Debes iniciar sesión para dar 'Me gusta'.")
+        return redirect('login')  
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            INSERT INTO comentario (id_us, id_publicacion, contenido, fec_pub)
+            VALUES (%s, %s, %s, %s)
+        """, [documento, id_publicacion, contenido, fec_pub])
+
+        messages.success(request, "¡Has comentado esta publicación!")
+
+    return redirect('home') 
+
+
+def comentarios(request, id_publicacion):
+    comentarios = []
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT id_us, id_publicacion, contenido, fec_pub
+            FROM comentario
+            WHERE id_publicacion = %s
+        """, [id_publicacion])
+        resultados = cursor.fetchall()
+
+        for resultado in resultados:
+            id_us, id_publicacion, contenido, fec_pub = resultado
+            comentarios.append({
+                'id_us': id_us,
+                'id_publicacion': id_publicacion,
+                'contenido': contenido,
+                'fec_pub': fec_pub,
+            })
+        print(comentarios)
+
+    return render(request, 'comentarios.html', {
+        'comentarios': comentarios,  
+        'id_publicacion': id_publicacion  
+    })
+
+
+def calcular_edad(fecha_nac):
+    hoy = datetime.today()
+    return hoy.year - fecha_nac.year - ((hoy.month, hoy.day) < (fecha_nac.month, fecha_nac.day))
+
+
+def usuarios(request):
     documento = request.session.get('documento')  
 
     usuarios = []  
@@ -298,6 +495,56 @@ def buscar_amigos(request):
     
     return render(request, 'addamigos.html', {'usuarios': usuarios})
 
+def filtros(request):
+    documento = request.session.get('documento')
+
+    edad_min = int(request.GET.get('edad_min', 18))
+    edad_max = int(request.GET.get('edad_max', 100))
+    ciudad = request.GET.get('ciudad', '')
+
+    usuarios = []  
+    ciudades = []  
+
+    if documento:
+        with connection.cursor() as cursor:
+            query = """
+                SELECT id_us, nombre, apellido, correo, fecha_nac, ubicacion
+                FROM usuario
+                WHERE id_us != %s
+            """
+            params = [documento]
+
+            # Aplicar filtros dinámicos
+            if ciudad:
+                query += " AND ubicacion = %s"
+                params.append(ciudad)
+
+            cursor.execute(query, params)
+            results = cursor.fetchall()
+
+            for row in results:
+                edad = calcular_edad(row[4])
+                if edad_min <= edad <= edad_max:
+                    usuarios.append({
+                        'id_us': row[0],
+                        'nombre': row[1],
+                        'apellido': row[2],
+                        'correo': row[3],
+                        'fecha_nac': row[4],
+                        'ubicacion': row[5],
+                        'edad': edad,
+                    })
+
+            cursor.execute("SELECT DISTINCT ubicacion FROM usuario")
+            ciudades = [row[0] for row in cursor.fetchall()]
+
+    return render(request, 'filtros.html', {
+        'usuarios': usuarios,
+        'ciudades': ciudades,
+        'edad_min': edad_min,
+        'edad_max': edad_max,
+        'ciudad_seleccionada': ciudad,
+    })
 
 def ver_perfil(request, id_us):
     usuario = []
@@ -305,7 +552,7 @@ def ver_perfil(request, id_us):
     if id_us:
         with connection.cursor() as cursor:
             query = """
-                SELECT nombre, apellido, correo, fecha_nac, ubicacion
+                SELECT id_us, nombre, apellido, correo, fecha_nac, ubicacion
                 FROM usuario
                 WHERE id_us = %s
             """
@@ -330,11 +577,12 @@ def ver_perfil(request, id_us):
             amigos = cursor.fetchall()
 
             if result:
-                nombre, apellido, correo, fecha_nac, ubicacion = result
+                id_us, nombre, apellido, correo, fecha_nac, ubicacion = result
                 today = date.today()
                 edad = today.year - fecha_nac.year - ((today.month, today.day) < (fecha_nac.month, fecha_nac.day))
                 
                 usuario = {
+                    'id_us': id_us,
                     'nombre': nombre,
                     'apellido': apellido,
                     'correo': correo,
@@ -473,6 +721,79 @@ def addamigo(request, id_us):
         
 
     return render(request, 'addamigos.html')
+
+
+
+def buscar_amigos(request):
+    usuarios = []
+    if request.method == 'POST':
+        amigo = request.POST.get('amigo', '').strip()  
+        documento = request.session.get('documento')
+
+        with connection.cursor() as cursor:
+            query = """
+                SELECT id_us, nombre, apellido, correo, fecha_nac, ubicacion
+                FROM usuario
+                WHERE id_us != %s AND (LOWER(nombre) LIKE %s OR LOWER(apellido) LIKE %s)
+            """
+            cursor.execute(query, [documento, f"%{amigo.lower()}%", f"%{amigo.lower()}%"])
+            results = cursor.fetchall()
+
+        usuarios = [
+            {
+                'id_us': row[0],
+                'nombre': row[1],
+                'apellido': row[2],
+                'correo': row[3],
+                'fecha_nac': row[4],
+                'ubicacion': row[5],
+            }
+            for row in results
+        ]
+
+    return render(request, 'addamigos.html', {'usuarios': usuarios})
+
+
+def publicaciones(request):
+    documento = request.session.get('documento')  # Obtienemos el documento del usuario logueado
+    
+    if not documento:
+        print("No se encontró documento en la sesión.")
+        return render(request, 'home.html', {'publicaciones': []})  
+    
+    publicaciones = []  # Lista de publicaciones
+    
+    with connection.cursor() as cursor:
+        query = """
+            SELECT p.titulo, p.contenido, p.fecha_pub, p.hora_pub, p.id_publicacion, 
+                   p.id_us, u.nombre, u.apellido, u.correo
+            FROM publicacion p
+            JOIN usuario u ON p.id_us = u.id_us
+            ORDER BY p.fecha_pub DESC, p.hora_pub DESC
+        """
+        cursor.execute(query)  
+        results = cursor.fetchall()  
+        
+        if not results:
+            print("No se encontraron publicaciones para el documento:", documento)
+        
+        # Formateamos los datos antes de agregar a la lista de publicaciones
+        publicaciones = [
+            {
+                'titulo': row[0],
+                'contenido': row[1],
+                'fecha_pub': row[2].strftime('%d/%m/%Y') if row[2] else None,
+                'hora_pub': row[3],
+                'id_publicacion': row[4],
+                'id_us': row[5],
+                'nombre_usuario': row[6],
+                'apellido_usuario': row[7],
+                'correo_usuario': row[8]
+            }
+            for row in results
+        ]
+
+    return render(request, 'publicaciones.html', {'publicaciones': publicaciones})
 
 
 def cerrar_sesion(request):
